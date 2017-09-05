@@ -146,6 +146,7 @@ class Application extends BaseApplication
     public function __construct($autoloader = null)
     {
         $this->autoloader = $autoloader;
+        $_SERVER['composer_autoloader_global'] = $autoloader;
         parent::__construct(self::APP_NAME, self::APP_VERSION);
     }
 

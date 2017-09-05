@@ -75,6 +75,29 @@ class Initialiser
      */
     private function requireOnce()
     {
+        $loader = $_SERVER['composer_autoloader_global'];
+
+        if ($loader instanceof \Composer\Autoload\ClassLoader) {
+            $classMap = $loader->getClassMap();
+            $consoleClasses = array_filter($classMap,
+                function ($input) {
+                    return (strpos($input, 'symfony/console') !== false);
+                }
+            );
+
+            foreach ($consoleClasses as $consoleClass => $consoleClassPath) {
+                $declaredClasses = get_declared_classes();
+                $declaredClasses = array_combine($declaredClasses, $declaredClasses);
+
+                $declaredInterfaces = get_declared_interfaces();
+                $declaredInterfaces = array_combine($declaredInterfaces, $declaredInterfaces);
+
+                if (!(isset($declaredClasses[$consoleClass]) || isset($declaredInterfaces[$consoleClass]))) {
+                    include $consoleClassPath;
+                }
+            }
+        }
+
         // Create a new AutoloadRestorer to capture current auto-loaders
         $restorer = new AutoloadRestorer();
 
